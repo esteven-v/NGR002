@@ -1,2 +1,2 @@
 # NGR002
-Capstone project
+Capstone project For fall 2025
