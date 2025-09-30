@@ -11,3 +11,4 @@ For further reference, please consider the following sections:
 * `test.html`: shows websocket messages, postman can't subscribe to websockets
 * TODO: implement rest of scenario object
 - Useful example for backend (also has example react app): https://github.com/subhnet/chat-app 
+- setup vscode for spring boot: https://code.visualstudio.com/docs/java/java-spring-boot
