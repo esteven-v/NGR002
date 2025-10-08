@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Spring Boot WebSocket Client</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.0/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+    <h1>WebSocket Messages</h1>
+    <div id="messages"></div>
+
+    <script>
+        var stompClient = null;
+
+        function connect() {
+            var socket = new SockJS('http://localhost:8080/ws'); // Your Spring Boot WebSocket endpoint
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/scenarios', function (message) {
+                    showMessage(JSON.parse(message.body));
+                });
+            }, function (error) {
+                console.error('STOMP Error:', error);
+            });
+        }
+
+        function disconnect() {
+            if (stompClient !== null) {
+                stompClient.disconnect();
+            }
+            console.log("Disconnected");
+        }
+
+        function showMessage(message) {
+            var messagesDiv = document.getElementById('messages');
+            var p = document.createElement('p');
+            p.appendChild(document.createTextNode(message));
+            messagesDiv.appendChild(p);
+        }
+
+        // Connect when the page loads
+        window.onload = connect;
+        // Disconnect when the page unloads
+        window.onbeforeunload = disconnect;
+    </script>
+</body>
+</html>
