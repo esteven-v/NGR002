@@ -2,7 +2,7 @@
 
 ## New dev instructions
 
-- start kafka server docker container: `docker run -p 9092:9092 apache/kafka-native:4.1.0`
+- start kafka server docker container: `docker run --network=host -p 9092:9092 apache/kafka-native:4.1.0`
     - do `docker pull apache/kafka-native:4.1.0` if not already installed
 - run `docker build -t ngr002 .` after any changes
 - run `docker run --network=host -p 8080:8080 ngr002`
