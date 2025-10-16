@@ -1,6 +1,16 @@
 # Getting Started
 
-## Run for development
+## New dev instructions
+
+- start kafka server docker container: `docker run --network=host -p 9092:9092 apache/kafka-native:4.1.0`
+    - do `docker pull apache/kafka-native:4.1.0` if not already installed
+- run `docker build -t ngr002 .` after any changes
+- run `docker run --network=host -p 8080:8080 ngr002`
+- open test.html file in browser, verify that the websocket has connected
+- open Postman and send a post request to `localhost:8080/create-scenario`
+- messages will appear in test.html
+
+## Old instructions (run spring boot app w/o docker container)
 
 - start kafka server docker container: `docker run -p 9092:9092 apache/kafka-native:4.1.0`
 - start springboot app: press `F5` in `NgrApplication.java`
