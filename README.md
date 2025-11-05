@@ -4,6 +4,14 @@
 
 Capstone NGR002 is a scenario management tool built with Java Springboot, Apache Kafka, and CesiumJS for 3D maps. Northrup Grumman develops event-based applications for USSTRATCOM. Administrators and trainees all need to be able to simultaneously participate in an event or drill. This is a proof of concept for this idea. Administrators should be able to create, play, pause, and edit scenarios, while regular users are able to view updates in real time.
 
+## Endpoints
+
+- `create-scenario` - initialize scenario
+- All of these endpoints use the Event class. Not every event type uses every field
+    - `create-area`: polygonCoords (array), polygonShape (string)
+    - `add-unit`: destination_coords (string)
+    - `move-unit`: destination_coords (string)
+
 ## Release Notes
 
 ### Code Milestone 1
@@ -16,7 +24,7 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 - Esteven-Branch: frontend/other components, currently not used yet
 
 ## New dev instructions (build spring boot app in containers)
-
+2    
 - start kafka server docker container: `docker run --network=host -p 9092:9092 apache/kafka-native:4.1.0`
     - do `docker pull apache/kafka-native:4.1.0` if not already installed
 - run `docker build -t ngr002 .` after any changes

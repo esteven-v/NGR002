@@ -31,14 +31,36 @@ public class UIController {
 		return scenario.getName()+" created";
 	}
 
+	// uses polygonCoords and polygonShape
 	@PostMapping("/create-area")
-	public String postMethodName(@RequestBody Event event) throws JsonProcessingException {
+	public String createArea(@RequestBody Event event) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		event.setType(EventType.AREA_CREATED);
 		String e = mapper.writeValueAsString(event);
 		kafkaProducer.sendMessage(e);
 		return event.getType()+" created";
 	}
+
+	@PostMapping("/add-unit")
+	public String addUnit(@RequestBody Event event) throws JsonProcessingException {
+
+		ObjectMapper mapper = new ObjectMapper();
+		event.setType(EventType.UNIT_ADDED);
+		String e = mapper.writeValueAsString(event);
+		kafkaProducer.sendMessage(e);
+		return event.getType()+" created";
+	}
+
+	@PostMapping("/move-unit")
+	public String moveUnit(@RequestBody Event event) throws JsonProcessingException {
+		ObjectMapper mapper = new ObjectMapper();
+		event.setType(EventType.UNIT_MOVED);
+		String e = mapper.writeValueAsString(event);
+		kafkaProducer.sendMessage(e);
+		return event.getType()+" created";
+	}
+	
+	
 	
 
 	@MessageMapping("/getScenarios")
