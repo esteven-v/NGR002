@@ -14,6 +14,15 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 
 ## Release Notes
 
+### Code Milestone 2
+- New class: `Event`: This holds multiple different event types and all properties an event could need
+- In `UIController.java`, there are new endpoints for each type of event
+    - when an event object is pushed to it's respective endpoint, the type is updated and pushed to Kafka
+- The `test.html` file still listens and recieves from the websocket endpoint
+
+- kafka-websocket-test branch: for backend
+- Esteven-Branch: frontend/other components, currently not used yet
+
 ### Code Milestone 1
 - Springboot backend is working and can connect to Kafka
 - POST requests from `/create-scenario` endpoint are sent to Kafka
