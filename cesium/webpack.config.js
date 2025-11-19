@@ -67,4 +67,12 @@ module.exports = {
     }),
   ],
   mode: "development",
+  devtool: "source-map", // optional: helpful for debugging
+  devServer: {
+    static: path.join(__dirname, "dist"),
+    compress: true,
+    port: 8081,
+    hot: true,
+  },
 };
+
