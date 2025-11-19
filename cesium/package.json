@@ -25,6 +25,7 @@
     "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
+    "@stomp/stompjs": "^7.2.1",
     "memfs": "^3.4.7",
     "sockjs-client": "^1.6.1",
     "stompjs": "^2.3.3"

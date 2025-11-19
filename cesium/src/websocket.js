@@ -1,25 +1,37 @@
 import SockJS from "sockjs-client";
-import Stomp from "stompjs";
+import { Client } from "@stomp/stompjs";
 
 let stompClient = null;
 
 export function connectWebSocket(onMessage) {
-  const socket = new SockJS("http://localhost:8080/ws");
-  stompClient = Stomp.over(socket);
+  // Create a new STOMP client
+  stompClient = new Client({
+    webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+    debug: (str) => console.log(str), // optional: logs STOMP debug messages
+  });
 
-  stompClient.connect({}, (frame) => {
+  // Called when connection is established
+  stompClient.onConnect = (frame) => {
     console.log("WebSocket Connected:", frame);
 
     stompClient.subscribe("/topic/scenarios", (message) => {
       const body = JSON.parse(message.body);
       onMessage(body); // send message to Cesium
     });
-  }, (error) => {
+  };
+
+  // Called on error
+  stompClient.onStompError = (error) => {
     console.error("STOMP Error:", error);
-  });
+  };
+
+  // Activate the connection
+  stompClient.activate();
 }
 
 export function disconnectWebSocket() {
-  if (stompClient) stompClient.disconnect();
-  console.log("WebSocket disconnected");
+  if (stompClient) {
+    stompClient.deactivate();
+    console.log("WebSocket disconnected");
+  }
 }
