@@ -74,7 +74,7 @@ module.exports = {
   devServer: {
     static: path.join(__dirname, "dist"),
     compress: true,
-    port: 8081,
+    port: 8080,
     hot: true,
   },
 };
