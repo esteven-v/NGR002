@@ -6,8 +6,6 @@ export default "// See IntersectionUtils.glsl for the definitions of Ray, Inters
 #define DEPTH_INTERSECTION_INDEX ###\n\
 */\n\
 \n\
-uniform mat4 u_transformPositionViewToUv;\n\
-\n\
 void intersectDepth(in vec2 screenCoord, in Ray ray, inout Intersections ix) {\n\
     float logDepthOrDepth = czm_unpackDepth(texture(czm_globeDepthTexture, screenCoord));\n\
     float entry;\n\
@@ -16,8 +14,7 @@ void intersectDepth(in vec2 screenCoord, in Ray ray, inout Intersections ix) {\n
         // Calculate how far the ray must travel before it hits the depth buffer.\n\
         vec4 eyeCoordinateDepth = czm_screenToEyeCoordinates(screenCoord, logDepthOrDepth);\n\
         eyeCoordinateDepth /= eyeCoordinateDepth.w;\n\
-        vec3 depthPositionUv = vec3(u_transformPositionViewToUv * eyeCoordinateDepth);\n\
-        entry = dot(depthPositionUv - ray.pos, ray.dir);\n\
+        entry = dot(eyeCoordinateDepth.xyz - ray.pos, ray.dir);\n\
         exit = +INF_HIT;\n\
     } else {\n\
         // There's no depth at this location.\n\

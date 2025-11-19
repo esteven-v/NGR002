@@ -7,5 +7,5 @@ export default "/**\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passVoxels = 9.0;\n\
+const float czm_passVoxels = 10.0;\n\
 ";

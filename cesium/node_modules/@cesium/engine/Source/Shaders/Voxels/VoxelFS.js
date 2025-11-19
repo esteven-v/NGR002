@@ -1,10 +1,10 @@
 //This file is automatically rebuilt by the Cesium build process.
 export default "// See Intersection.glsl for the definition of intersectScene\n\
 // See IntersectionUtils.glsl for the definition of nextIntersection\n\
-// See convertUvToBox.glsl, convertUvToCylinder.glsl, or convertUvToEllipsoid.glsl\n\
-// for the definition of convertUvToShapeUvSpace. The appropriate function is \n\
-// selected based on the VoxelPrimitive shape type, and added to the shader in\n\
-// Scene/VoxelRenderResources.js.\n\
+// See convertLocalToBoxUv.glsl, convertLocalToCylinderUv.glsl, or convertLocalToEllipsoidUv.glsl\n\
+// for the definitions of convertLocalToShapeSpaceDerivative and getTileAndUvCoordinate. \n\
+// The appropriate functions are selected based on the VoxelPrimitive shape type, \n\
+// and added to the shader in Scene/VoxelRenderResources.js.\n\
 // See Octree.glsl for the definitions of TraversalData, SampleData,\n\
 // traverseOctreeFromBeginning, and traverseOctreeFromExisting\n\
 // See Megatexture.glsl for the definition of accumulatePropertiesFromMegatexture\n\
@@ -16,10 +16,10 @@ export default "// See Intersection.glsl for the definition of intersectScene\n\
     #define ALPHA_ACCUM_MAX 0.98 // Must be > 0.0 and <= 1.0\n\
 #endif\n\
 \n\
-uniform mat4 u_transformPositionUvToView;\n\
+uniform mat4 u_transformPositionViewToLocal;\n\
 uniform mat3 u_transformDirectionViewToLocal;\n\
-uniform vec3 u_cameraPositionUv;\n\
-uniform vec3 u_cameraDirectionUv;\n\
+uniform vec3 u_cameraPositionLocal;\n\
+uniform vec3 u_cameraDirectionLocal;\n\
 uniform float u_stepSize;\n\
 \n\
 #if defined(PICKING)\n\
@@ -64,16 +64,15 @@ RayShapeIntersection getVoxelIntersection(in vec3 tileUv, in vec3 sampleSizeAlon
 }\n\
 \n\
 vec4 getStepSize(in SampleData sampleData, in Ray viewRay, in RayShapeIntersection shapeIntersection, in mat3 jacobianT, in float currentT) {\n\
-    // The Jacobian is computed in a space where the shape spans [-1, 1].\n\
-    // But the ray is marched in a space where the shape fills [0, 1].\n\
-    // So we need to scale the Jacobian by 2.\n\
-    vec3 gradient = 2.0 * viewRay.rawDir * jacobianT;\n\
+    vec3 gradient = viewRay.dir * jacobianT;\n\
     vec3 sampleSizeAlongRay = getSampleSize(sampleData.tileCoords.w) / gradient;\n\
 \n\
     RayShapeIntersection voxelIntersection = getVoxelIntersection(sampleData.tileUv, sampleSizeAlongRay);\n\
 \n\
-    // Transform normal from shape space to Cartesian space\n\
-    vec3 voxelNormal = normalize(jacobianT * voxelIntersection.entry.xyz);\n\
+    // Transform normal from shape space to Cartesian space to eye space\n\
+    vec3 voxelNormal = jacobianT * voxelIntersection.entry.xyz;\n\
+    voxelNormal = normalize(czm_normal * voxelNormal);\n\
+\n\
     // Compare with the shape intersection, to choose the appropriate normal\n\
     vec4 voxelEntry = vec4(voxelNormal, currentT + voxelIntersection.entry.w);\n\
     vec4 entry = intersectionMax(shapeIntersection.entry, voxelEntry);\n\
@@ -115,37 +114,40 @@ int getSampleIndex(in SampleData sampleData) {\n\
 }\n\
 \n\
 /**\n\
- * Compute the view ray at the current fragment, in the local UV coordinates of the shape.\n\
+ * Compute the view ray at the current fragment, in the local coordinates of the shape.\n\
  */\n\
-Ray getViewRayUv() {\n\
+Ray getViewRayLocal() {\n\
     vec4 eyeCoordinates = czm_windowToEyeCoordinates(gl_FragCoord);\n\
-    vec3 viewDirUv;\n\
-    vec3 viewPosUv;\n\
+    vec3 origin;\n\
+    vec3 direction;\n\
     if (czm_orthographicIn3D == 1.0) {\n\
         eyeCoordinates.z = 0.0;\n\
-        viewPosUv = (u_transformPositionViewToUv * eyeCoordinates).xyz;\n\
-        viewDirUv = normalize(u_cameraDirectionUv);\n\
+        origin = (u_transformPositionViewToLocal * eyeCoordinates).xyz;\n\
+        direction = u_cameraDirectionLocal;\n\
     } else {\n\
-        viewPosUv = u_cameraPositionUv;\n\
-        viewDirUv = normalize(u_transformDirectionViewToLocal * eyeCoordinates.xyz);\n\
+        origin = u_cameraPositionLocal;\n\
+        direction = u_transformDirectionViewToLocal * normalize(eyeCoordinates.xyz);\n\
     }\n\
-    #if defined(SHAPE_ELLIPSOID)\n\
-        // viewDirUv has been scaled to a space where the ellipsoid is a sphere.\n\
-        // Undo this scaling to get the raw direction.\n\
-        vec3 rawDir = viewDirUv * u_ellipsoidRadiiUv;\n\
-        return Ray(viewPosUv, viewDirUv, rawDir);\n\
-    #else\n\
-        return Ray(viewPosUv, viewDirUv, viewDirUv);\n\
-    #endif\n\
+    return Ray(origin, direction);\n\
+}\n\
+\n\
+Ray getViewRayEC() {\n\
+    vec4 eyeCoordinates = czm_windowToEyeCoordinates(gl_FragCoord);\n\
+    vec3 viewPosEC = (czm_orthographicIn3D == 1.0)\n\
+        ? vec3(eyeCoordinates.xy, 0.0)\n\
+        : vec3(0.0);\n\
+    vec3 viewDirEC = normalize(eyeCoordinates.xyz);\n\
+    return Ray(viewPosEC, viewDirEC);\n\
 }\n\
 \n\
 void main()\n\
 {\n\
-    Ray viewRayUv = getViewRayUv();\n\
+    Ray viewRayLocal = getViewRayLocal();\n\
+    Ray viewRayEC = getViewRayEC();\n\
 \n\
     Intersections ix;\n\
     vec2 screenCoord = (gl_FragCoord.xy - czm_viewport.xy) / czm_viewport.zw; // [0,1]\n\
-    RayShapeIntersection shapeIntersection = intersectScene(screenCoord, viewRayUv, ix);\n\
+    RayShapeIntersection shapeIntersection = intersectScene(screenCoord, viewRayLocal, viewRayEC, ix);\n\
     // Exit early if the scene was completely missed.\n\
     if (shapeIntersection.entry.w == NO_HIT) {\n\
         discard;\n\
@@ -153,20 +155,17 @@ void main()\n\
 \n\
     float currentT = shapeIntersection.entry.w;\n\
     float endT = shapeIntersection.exit.w;\n\
-    vec3 positionUv = viewRayUv.pos + currentT * viewRayUv.dir;\n\
-    PointJacobianT pointJacobian = convertUvToShapeUvSpaceDerivative(positionUv);\n\
+\n\
+    vec3 positionEC = viewRayEC.pos + currentT * viewRayEC.dir;\n\
+    TileAndUvCoordinate tileAndUv = getTileAndUvCoordinate(positionEC);\n\
+    vec3 positionLocal = viewRayLocal.pos + currentT * viewRayLocal.dir;\n\
+    mat3 jacobianT = convertLocalToShapeSpaceDerivative(positionLocal);\n\
 \n\
     // Traverse the tree from the start position\n\
     TraversalData traversalData;\n\
     SampleData sampleDatas[SAMPLE_COUNT];\n\
-    traverseOctreeFromBeginning(pointJacobian.point, traversalData, sampleDatas);\n\
-    vec4 step = getStepSize(sampleDatas[0], viewRayUv, shapeIntersection, pointJacobian.jacobianT, currentT);\n\
-\n\
-    #if defined(JITTER)\n\
-        float noise = hash(screenCoord); // [0,1]\n\
-        currentT += noise * step.w;\n\
-        positionUv += noise * step.w * viewRayUv.dir;\n\
-    #endif\n\
+    traverseOctreeFromBeginning(tileAndUv, traversalData, sampleDatas);\n\
+    vec4 step = getStepSize(sampleDatas[0], viewRayLocal, shapeIntersection, jacobianT, currentT);\n\
 \n\
     FragmentInput fragmentInput;\n\
     #if defined(STATISTICS)\n\
@@ -183,10 +182,11 @@ void main()\n\
         // Prepare the custom shader inputs\n\
         copyPropertiesToMetadata(properties, fragmentInput.metadata);\n\
 \n\
-        fragmentInput.attributes.positionEC = vec3(u_transformPositionUvToView * vec4(positionUv, 1.0));\n\
-        fragmentInput.attributes.normalEC = normalize(czm_normal * step.xyz);\n\
+        fragmentInput.attributes.positionEC = positionEC;\n\
+        // Re-normalize normals: some shape intersections may have been scaled to encode positive/negative shapes\n\
+        fragmentInput.attributes.normalEC = normalize(step.xyz);\n\
 \n\
-        fragmentInput.voxel.viewDirUv = viewRayUv.dir;\n\
+        fragmentInput.voxel.viewDirUv = viewRayLocal.dir;\n\
 \n\
         fragmentInput.voxel.travelDistance = step.w;\n\
         fragmentInput.voxel.stepCount = stepCount;\n\
@@ -234,13 +234,15 @@ void main()\n\
                 }\n\
             #endif\n\
         }\n\
-        positionUv = viewRayUv.pos + currentT * viewRayUv.dir;\n\
+        positionEC = viewRayEC.pos + currentT * viewRayEC.dir;\n\
+        tileAndUv = getTileAndUvCoordinate(positionEC);\n\
+        positionLocal = viewRayLocal.pos + currentT * viewRayLocal.dir;\n\
+        jacobianT = convertLocalToShapeSpaceDerivative(positionLocal);\n\
 \n\
         // Traverse the tree from the current ray position.\n\
         // This is similar to traverseOctreeFromBeginning but is faster when the ray is in the same tile as the previous step.\n\
-        pointJacobian = convertUvToShapeUvSpaceDerivative(positionUv);\n\
-        traverseOctreeFromExisting(pointJacobian.point, traversalData, sampleDatas);\n\
-        step = getStepSize(sampleDatas[0], viewRayUv, shapeIntersection, pointJacobian.jacobianT, currentT);\n\
+        traverseOctreeFromExisting(tileAndUv, traversalData, sampleDatas);\n\
+        step = getStepSize(sampleDatas[0], viewRayLocal, shapeIntersection, jacobianT, currentT);\n\
     }\n\
 \n\
     // Convert the alpha from [0,ALPHA_ACCUM_MAX] to [0,1]\n\

@@ -2,6 +2,14 @@
 export default "// See IntersectionUtils.glsl for the definitions of Ray, NO_HIT, INF_HIT,\n\
 // RayShapeIntersection\n\
 \n\
+vec4 transformNormalToEC(in vec4 intersection) {\n\
+    return vec4(normalize(czm_normal * intersection.xyz), intersection.w);\n\
+}\n\
+\n\
+RayShapeIntersection transformNormalsToEC(in RayShapeIntersection ix) {\n\
+    return RayShapeIntersection(transformNormalToEC(ix.entry), transformNormalToEC(ix.exit));\n\
+}\n\
+\n\
 vec4 intersectLongitude(in Ray ray, in float angle, in bool positiveNormal) {\n\
     float normalSign = positiveNormal ? 1.0 : -1.0;\n\
     vec2 planeNormal = vec2(-sin(angle), cos(angle)) * normalSign;\n\
@@ -33,8 +41,8 @@ RayShapeIntersection intersectHalfSpace(in Ray ray, in float angle, in bool posi
 \n\
 void intersectFlippedWedge(in Ray ray, in vec2 minMaxAngle, out RayShapeIntersection intersections[2])\n\
 {\n\
-    intersections[0] = intersectHalfSpace(ray, minMaxAngle.x, false);\n\
-    intersections[1] = intersectHalfSpace(ray, minMaxAngle.y, true);\n\
+    intersections[0] = transformNormalsToEC(intersectHalfSpace(ray, minMaxAngle.x, false));\n\
+    intersections[1] = transformNormalsToEC(intersectHalfSpace(ray, minMaxAngle.y, true));\n\
 }\n\
 \n\
 bool hitPositiveHalfPlane(in Ray ray, in vec4 intersection, in bool positiveNormal) {\n\
@@ -47,14 +55,18 @@ bool hitPositiveHalfPlane(in Ray ray, in vec4 intersection, in bool positiveNorm
 void intersectHalfPlane(in Ray ray, in float angle, out RayShapeIntersection intersections[2]) {\n\
     vec4 intersection = intersectLongitude(ray, angle, true);\n\
     vec4 farSide = vec4(normalize(ray.dir), INF_HIT);\n\
+    bool hitPositiveSide = hitPositiveHalfPlane(ray, intersection, true);\n\
 \n\
-    if (hitPositiveHalfPlane(ray, intersection, true)) {\n\
+    farSide = transformNormalToEC(farSide);\n\
+\n\
+    if (hitPositiveSide) {\n\
+        intersection = transformNormalToEC(intersection);\n\
         intersections[0].entry = -1.0 * farSide;\n\
-        intersections[0].exit = vec4(-1.0 * intersection.xy, 0.0, intersection.w);\n\
+        intersections[0].exit = vec4(-1.0 * intersection.xyz, intersection.w);\n\
         intersections[1].entry = intersection;\n\
         intersections[1].exit = farSide;\n\
     } else {\n\
-        vec4 miss = vec4(normalize(ray.dir), NO_HIT);\n\
+        vec4 miss = vec4(normalize(czm_normal * ray.dir), NO_HIT);\n\
         intersections[0].entry = -1.0 * farSide;\n\
         intersections[0].exit = farSide;\n\
         intersections[1].entry = miss;\n\
@@ -89,16 +101,16 @@ RayShapeIntersection intersectRegularWedge(in Ray ray, in vec2 minMaxAngle)\n\
 \n\
     if (exitFromInside && enterFromOutside) {\n\
         // Ray crosses both faces of negative wedge, exiting then entering the positive shape\n\
-        return RayShapeIntersection(first, last);\n\
+        return transformNormalsToEC(RayShapeIntersection(first, last));\n\
     } else if (!exitFromInside && enterFromOutside) {\n\
         // Ray starts inside wedge. last is in shadow wedge, and first is actually the entry\n\
-        return RayShapeIntersection(-1.0 * farSide, first);\n\
+        return transformNormalsToEC(RayShapeIntersection(-1.0 * farSide, first));\n\
     } else if (exitFromInside && !enterFromOutside) {\n\
         // First intersection was in the shadow wedge, so last is actually the exit\n\
-        return RayShapeIntersection(last, farSide);\n\
+        return transformNormalsToEC(RayShapeIntersection(last, farSide));\n\
     } else { // !exitFromInside && !enterFromOutside\n\
         // Both intersections were in the shadow wedge\n\
-        return RayShapeIntersection(miss, miss);\n\
+        return transformNormalsToEC(RayShapeIntersection(miss, miss));\n\
     }\n\
 }\n\
 ";

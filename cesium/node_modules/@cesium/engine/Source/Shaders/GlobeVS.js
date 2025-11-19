@@ -142,7 +142,7 @@ void main()\n\
 #elif defined(INCLUDE_WEB_MERCATOR_Y)\n\
     float webMercatorT = czm_decompressTextureCoordinates(compressed0.w).x;\n\
     float encodedNormal = 0.0;\n\
-#elif defined(ENABLE_VERTEX_LIGHTING) || defined(GENERATE_POSITION_AND_NORMAL)\n\
+#elif defined(ENABLE_VERTEX_LIGHTING) || defined(GENERATE_POSITION_AND_NORMAL) || defined(APPLY_MATERIAL)\n\
     float webMercatorT = textureCoordinates.y;\n\
     float encodedNormal = compressed0.w;\n\
 #else\n\

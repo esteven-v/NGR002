@@ -14,5 +14,4 @@ export default "void primitiveOutlineStage(inout czm_modelMaterial material) {\n
 \n\
     material.diffuse = mix(material.diffuse, model_outlineColor.rgb, model_outlineColor.a * outlineness);\n\
 }\n\
-\n\
 ";

@@ -7,5 +7,5 @@ export default "/**\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passCesium3DTileClassificationIgnoreShow = 6.0;\n\
+const float czm_passCesium3DTileClassificationIgnoreShow = 7.0;\n\
 ";

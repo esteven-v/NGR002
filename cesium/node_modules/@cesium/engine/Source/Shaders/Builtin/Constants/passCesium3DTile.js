@@ -7,5 +7,5 @@ export default "/**\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passCesium3DTile = 4.0;\n\
+const float czm_passCesium3DTile = 5.0;\n\
 ";

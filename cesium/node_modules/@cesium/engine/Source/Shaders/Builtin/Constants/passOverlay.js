@@ -7,5 +7,5 @@ export default "/**\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passOverlay = 11.0;\n\
+const float czm_passOverlay = 12.0;\n\
 ";

@@ -66,21 +66,6 @@ void main(void)\n\
 #endif // SPHERICAL\n\
 #endif // TEXTURE_COORDINATES\n\
 \n\
-#ifdef PICK\n\
-#ifdef CULL_FRAGMENTS\n\
-    // When classifying translucent geometry, logDepthOrDepth == 0.0\n\
-    // indicates a region that should not be classified, possibly due to there\n\
-    // being opaque pixels there in another buffer.\n\
-    // Check for logDepthOrDepth != 0.0 to make sure this should be classified.\n\
-    if (0.0 <= uv.x && uv.x <= 1.0 && 0.0 <= uv.y && uv.y <= 1.0 || logDepthOrDepth != 0.0) {\n\
-        out_FragColor.a = 1.0; // 0.0 alpha leads to discard from ShaderSource.createPickFragmentShaderSource\n\
-        czm_writeDepthClamp();\n\
-    }\n\
-#else // CULL_FRAGMENTS\n\
-        out_FragColor.a = 1.0;\n\
-#endif // CULL_FRAGMENTS\n\
-#else // PICK\n\
-\n\
 #ifdef CULL_FRAGMENTS\n\
     // When classifying translucent geometry, logDepthOrDepth == 0.0\n\
     // indicates a region that should not be classified, possibly due to there\n\
@@ -89,6 +74,13 @@ void main(void)\n\
         discard;\n\
     }\n\
 #endif\n\
+\n\
+#ifdef PICK\n\
+    out_FragColor.a = 1.0; // Explicitly set the alpha, otherwise this may be discarded by ShaderSource.createPickFragmentShaderSource\n\
+#ifdef CULL_FRAGMENTS\n\
+    czm_writeDepthClamp();\n\
+#endif // CULL_FRAGMENTS\n\
+#else // PICK\n\
 \n\
 #ifdef NORMAL_EC\n\
     // Compute normal by sampling adjacent pixels in 2x2 block in screen space\n\

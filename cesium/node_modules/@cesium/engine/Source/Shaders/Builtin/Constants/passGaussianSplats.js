@@ -7,5 +7,5 @@ export default "/**\n\
  *\n\
  * @see czm_pass\n\
  */\n\
-const float czm_passGaussianSplats = 10.0;\n\
+const float czm_passGaussianSplats = 11.0;\n\
 ";

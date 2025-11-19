@@ -12,9 +12,9 @@ export default "// Main intersection function for Voxel scenes.\n\
 #define INTERSECTION_COUNT ###\n\
 */\n\
 \n\
-RayShapeIntersection intersectScene(in vec2 screenCoord, in Ray ray, out Intersections ix) {\n\
+RayShapeIntersection intersectScene(in vec2 screenCoord, in Ray ray, in Ray rayEC, out Intersections ix) {\n\
     // Do a ray-shape intersection to find the exact starting and ending points.\n\
-    intersectShape(ray, ix);\n\
+    intersectShape(ray, rayEC, ix);\n\
 \n\
     // Exit early if the positive shape was completely missed or behind the ray.\n\
     RayShapeIntersection intersection = getFirstIntersection(ix);\n\
@@ -29,7 +29,7 @@ RayShapeIntersection intersectScene(in vec2 screenCoord, in Ray ray, out Interse
     #endif\n\
 \n\
     // Depth\n\
-    intersectDepth(screenCoord, ray, ix);\n\
+    intersectDepth(screenCoord, rayEC, ix);\n\
 \n\
     // Find the first intersection that's in front of the ray\n\
     #if (INTERSECTION_COUNT > 1)\n\
