@@ -41,6 +41,7 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 - open test.html file in browser, verify that the websocket has connected
 - open Postman and send a post request to `localhost:8080/create-scenario`
 - messages will appear in test.html
+- frontend: go into `cesium` folder, run `npm install` if first downloading, then run `npm start`
 
 ## Old instructions (run spring boot app w/o docker container)
 
