@@ -13,7 +13,7 @@
         var stompClient = null;
 
         function connect() {
-            var socket = new SockJS('http://localhost:8080/ws'); // Your Spring Boot WebSocket endpoint
+            var socket = new SockJS('ws://localhost:8080/ws'); // Your Spring Boot WebSocket endpoint
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 console.log('Connected: ' + frame);

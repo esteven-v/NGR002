@@ -9,12 +9,12 @@ import {
 } from "cesium";
 import "cesium/Widgets/widgets.css";
 import "../src/css/main.css";
-
-import { connectWebSocket, disconnectWebSocket } from "./websocket";
+import {connectWebSocket} from './websocket.js';
 
 Ion.defaultAccessToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDkzYTkwZi03MmJjLTQwMjAtYjBiNi0zOTE2NGFiZjAwNTMiLCJpZCI6MzQ0MDI2LCJpYXQiOjE3NTg2NTM0MDl9.AXndWa8nrm6BAvaZKh18y04HNmLUESVh8HiCiHB_yzI";
 
+connectWebSocket();
 // Initialize Cesium Viewer
 const viewer = new Viewer("cesiumContainer", {
   terrain: Terrain.fromWorldTerrain(),
@@ -34,27 +34,8 @@ viewer.camera.flyTo({
 });
 
 // --- WebSocket integration ---
-connectWebSocket((message) => {
-  console.log("Received scenario update:", message);
-
-  // Example: add a point for each message
-  if (message.lat && message.lon) {
-    viewer.entities.add({
-      position: Cartesian3.fromDegrees(
-        message.lon,
-        message.lat,
-        message.alt || 0
-      ),
-      point: {
-        pixelSize: 10,
-        color: Color.RED,
-      },
-    });
-  }
-});
 
 // Optional: disconnect WebSocket on window unload
 window.addEventListener("beforeunload", () => {
   disconnectWebSocket();
 });
-
