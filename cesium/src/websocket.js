@@ -7,19 +7,28 @@ export function connectWebSocket() {
   const socket = new SockJS("http://localhost:8080/ws");
   stompClient = Stomp.over(socket);
 
-  stompClient.connect({}, (frame) => {
+  // Called when connection is established
+  stompClient.onConnect = (frame) => {
     console.log("WebSocket Connected:", frame);
 
     stompClient.subscribe("/topic/scenarios", (message) => {
       const body = JSON.parse(message.body);
       console.log(body);
     });
-  }, (error) => {
+  };
+
+  // Called on error
+  stompClient.onStompError = (error) => {
     console.error("STOMP Error:", error);
-  });
+  };
+
+  // Activate the connection
+  stompClient.activate();
 }
 
 export function disconnectWebSocket() {
-  if (stompClient) stompClient.disconnect();
-  console.log("WebSocket disconnected");
+  if (stompClient) {
+    stompClient.deactivate();
+    console.log("WebSocket disconnected");
+  }
 }
