@@ -11,9 +11,9 @@
     "start": "webpack serve --config webpack.config.js --open"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.4",
-    "@babel/preset-env": "^7.28.3",
-    "babel-loader": "^10.0.0",
+    "@babel/core": "7.22",
+    "@babel/preset-env": "^7.28.5",
+    "babel-loader": "^9.2.1",
     "cesium": "^1.133.1",
     "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
@@ -25,6 +25,7 @@
     "webpack-dev-server": "^5.2.2"
   },
   "dependencies": {
-    "memfs": "^3.4.7"
+    "memfs": "^3.4.7",
+    "stompjs": "^2.3.3"
   }
 }
