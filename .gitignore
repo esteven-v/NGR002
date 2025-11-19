@@ -31,4 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
-/cesium/node_modules
+cesium/node_modules
