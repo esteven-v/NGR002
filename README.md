@@ -14,6 +14,14 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 
 ## Release Notes
 
+### Code Milestone 3
+- The CesiumJS project has been migrated into the main repository. Currently it just displays the map and has a bottom section showing events/actions.
+- Websocket logic is stored in `websocket.js`, and called when the page is loaded after the cesium map.
+- The rest of the source files are the same as the CesiumJS demo code
+
+- kafka-websocket-test branch: backend, minimal changes
+- Esteven-Branch: Used to migrate CesiumJS code, add additional functionality for demo
+
 ### Code Milestone 2
 - New class: `Event`: This holds multiple different event types and all properties an event could need
 - In `UIController.java`, there are new endpoints for each type of event
