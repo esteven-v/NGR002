@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Cesium tests</title>
+    <title>Cesium test</title>
     <link href="https://cdn.jsdelivr.net/npm/cesium@1.109.0/Build/Cesium/Cesium.css" rel="stylesheet">
     <link href="./src/css/main.css" rel="stylesheet">
     <style>
@@ -49,6 +49,7 @@
       #scenario-status div {
         padding: 5px;
         border-bottom: 1px solid #ccc;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -58,14 +59,14 @@
     <div id="controlPanelContainer">
       <div class="control-panel">
         <h2>Create/Edit Scenario</h2>
-        <select id="how harcore is it ">
+        <select id="scenario-color">
           <option value="green">not a big deal</option>
           <option value="red">avenger level threat</option>
-          <option value="yellow">hotdog catagoriy</option>
+          <option value="yellow">hotdog category</option>
         </select>
         <input type="text" id="scenario-type" placeholder="Scenario Name" />
         <textarea id="scenario-coords" placeholder="Polygon Coordinates (lon,lat; lon,lat)"></textarea>
-        <button id="add-scenario-btn">Add Scenario</button>
+        <button id="add-scenario-btn">Add/Update Scenario</button>
       </div>
 
       <h2>Scenario Dashboard</h2>
@@ -75,4 +76,3 @@
     <script type="module" src="./index.js"></script>
   </body>
 </html>
-

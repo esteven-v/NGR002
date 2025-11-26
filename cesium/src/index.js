@@ -17,6 +17,9 @@ Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDkzY
 
 let viewer;
 
+// Keep track of scenarios
+const scenarios = {};
+
 // Initialize Cesium
 async function initCesium() {
   viewer = new Viewer("cesiumContainer", {
@@ -60,8 +63,8 @@ window.addEventListener("beforeunload", () => {
 // --- Control panel logic ---
 const addBtn = document.getElementById("add-scenario-btn");
 addBtn.addEventListener("click", () => {
-  const type = document.getElementById("scenario-type").value;
-  const coordsStr = document.getElementById("scenario-coords").value;
+  const type = document.getElementById("scenario-type").value.trim();
+  const coordsStr = document.getElementById("scenario-coords").value.trim();
   const colorChoice = document.getElementById("scenario-color").value;
 
   if (!type || !coordsStr) {
@@ -91,21 +94,53 @@ addBtn.addEventListener("click", () => {
     return Cartesian3.fromDegrees(lon, lat);
   });
 
-  // Add polygon with chosen color
-  viewer.entities.add({
-    name: type,
-    polygon: {
-      hierarchy: new PolygonHierarchy(coords),
-      material: polygonColor,
-      outline: true,
-      outlineColor: Color.BLACK
-    }
-  });
+  // Check if scenario already exists
+  if (scenarios[type]) {
+    // Update existing polygon
+    const entity = scenarios[type];
+    entity.polygon.hierarchy = new PolygonHierarchy(coords);
+    entity.polygon.material = polygonColor;
+  } else {
+    // Add new polygon
+    const entity = viewer.entities.add({
+      name: type,
+      polygon: {
+        hierarchy: new PolygonHierarchy(coords),
+        material: polygonColor,
+        outline: true,
+        outlineColor: Color.BLACK
+      }
+    });
+    scenarios[type] = entity; // store in map
+  }
 
-  // Dashboard update
-  const scenarioDiv = document.createElement("div");
-  scenarioDiv.textContent = `Created: ${type} (${colorChoice}) with ${coordsStr}`;
-  document.getElementById("scenario-status").appendChild(scenarioDiv);
+  // Update dashboard (append new only if not existing)
+  if (!document.getElementById(`dashboard-${type}`)) {
+    const scenarioDiv = document.createElement("div");
+    scenarioDiv.id = `dashboard-${type}`;
+    scenarioDiv.textContent = `Created/Updated: ${type} (${colorChoice}) with ${coordsStr}`;
+    document.getElementById("scenario-status").appendChild(scenarioDiv);
+
+    // Make dashboard clickable to fly to scenario
+    scenarioDiv.addEventListener("click", () => {
+      const entity = scenarios[type];
+      if (!entity) return;
+
+      const hierarchy = entity.polygon.hierarchy.getValue();
+      if (!hierarchy || !hierarchy.positions) return;
+
+      const positions = hierarchy.positions;
+      const cartographics = positions.map(c => Cartographic.fromCartesian(c));
+      const avgLon = cartographics.reduce((sum, c) => sum + c.longitude, 0) / cartographics.length;
+      const avgLat = cartographics.reduce((sum, c) => sum + c.latitude, 0) / cartographics.length;
+      const center = Cartesian3.fromRadians(avgLon, avgLat, 200);
+
+      viewer.camera.flyTo({
+        destination: center,
+        orientation: { heading: CesiumMath.toRadians(0), pitch: CesiumMath.toRadians(-30) }
+      });
+    });
+  }
 
   // Fly camera to polygon center
   try {
