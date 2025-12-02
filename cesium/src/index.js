@@ -67,100 +67,16 @@ addBtn.addEventListener("click", () => {
   const coordsStr = document.getElementById("scenario-coords").value.trim();
   const colorChoice = document.getElementById("scenario-color").value;
 
-  if (!type || !coordsStr) {
-    alert("Please enter scenario name and coordinates.");
-    return;
-  }
-
-  // Map selected color to Cesium.Color
-  let polygonColor;
-  switch (colorChoice) {
-    case "green":
-      polygonColor = Color.GREEN.withAlpha(0.5);
-      break;
-    case "red":
-      polygonColor = Color.RED.withAlpha(0.5);
-      break;
-    case "yellow":
-      polygonColor = Color.YELLOW.withAlpha(0.5);
-      break;
-    default:
-      polygonColor = Color.BLUE.withAlpha(0.5);
-  }
-
-  // Parse coordinates
-  const coords = coordsStr.split(";").map(pair => {
-    const [lon, lat] = pair.trim().split(",").map(Number);
-    return Cartesian3.fromDegrees(lon, lat);
-  });
-
-  // Check if scenario already exists
-  if (scenarios[type]) {
-    // Update existing polygon
-    const entity = scenarios[type];
-    entity.polygon.hierarchy = new PolygonHierarchy(coords);
-    entity.polygon.material = polygonColor;
-  } else {
-    // Add new polygon
-    const entity = viewer.entities.add({
-      name: type,
-      polygon: {
-        hierarchy: new PolygonHierarchy(coords),
-        material: polygonColor,
-        outline: true,
-        outlineColor: Color.BLACK
-      }
-    });
-    scenarios[type] = entity; // store in map
-  }
-
-  // Update dashboard (append new only if not existing)
-  if (!document.getElementById(`dashboard-${type}`)) {
-    const scenarioDiv = document.createElement("div");
-    scenarioDiv.id = `dashboard-${type}`;
-    scenarioDiv.textContent = `Created/Updated: ${type} (${colorChoice}) with ${coordsStr}`;
-    document.getElementById("scenario-status").appendChild(scenarioDiv);
-
-    // Make dashboard clickable to fly to scenario
-    scenarioDiv.addEventListener("click", () => {
-      const entity = scenarios[type];
-      if (!entity) return;
-
-      const hierarchy = entity.polygon.hierarchy.getValue();
-      if (!hierarchy || !hierarchy.positions) return;
-
-      const positions = hierarchy.positions;
-      const cartographics = positions.map(c => Cartographic.fromCartesian(c));
-      const avgLon = cartographics.reduce((sum, c) => sum + c.longitude, 0) / cartographics.length;
-      const avgLat = cartographics.reduce((sum, c) => sum + c.latitude, 0) / cartographics.length;
-      const center = Cartesian3.fromRadians(avgLon, avgLat, 200);
-
-      viewer.camera.flyTo({
-        destination: center,
-        orientation: { heading: CesiumMath.toRadians(0), pitch: CesiumMath.toRadians(-30) }
-      });
-    });
-  }
-
-  // Fly camera to polygon center
-  try {
-    const cartographics = coords.map(c => Cartographic.fromCartesian(c));
-    const avgLon = cartographics.reduce((sum, c) => sum + c.longitude, 0) / cartographics.length;
-    const avgLat = cartographics.reduce((sum, c) => sum + c.latitude, 0) / cartographics.length;
-    const center = Cartesian3.fromRadians(avgLon, avgLat, 200);
-
-    viewer.camera.flyTo({
-      destination: center,
-      orientation: {
-        heading: CesiumMath.toRadians(0.0),
-        pitch: CesiumMath.toRadians(-30.0),
-      },
-    });
-  } catch (e) {
-    console.error("Error flying to scenario:", e);
-  }
-
-  // Clear inputs
-  document.getElementById("scenario-type").value = "";
-  document.getElementById("scenario-coords").value = "";
+  // fetch request here
+  fetch("http://localhost:8080/create-area", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      "polygonCoords": coordsStr,
+      "polygonColor": colorChoice,
+      "name": type
+    }),
+  })
 });

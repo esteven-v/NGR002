@@ -1,5 +1,17 @@
 import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
+import {
+  Ion,
+  Viewer,
+  Terrain,
+  createOsmBuildingsAsync,
+  Cartesian3,
+  Math as CesiumMath,
+  Color,
+  PolygonHierarchy,
+  Cartographic
+} from "cesium";
+import "cesium/Widgets/widgets.css";
 
 let stompClient = null;
 
@@ -19,23 +31,50 @@ export function connectWebSocket() {
       document.getElementById("scenario-status").appendChild(scenarioDiv);
 
       console.log("Received scenario event:", body);
+      let polygonColor;
+      switch (body.polygonColor) {
+        case "green":
+          polygonColor = Color.GREEN.withAlpha(0.5);
+          break;
+        case "red":
+          polygonColor = Color.RED.withAlpha(0.5);
+          break;
+        case "yellow":
+          polygonColor = Color.YELLOW.withAlpha(0.5);
+          break;
+        default:
+          polygonColor = Color.BLUE.withAlpha(0.5);
+      }
 
       // --- Update Cesium map dynamically ---
       if (window.viewer) {
         try {
           const coords = body.polygonCoords.split(";").map(pair => {
             const [lon, lat] = pair.trim().split(",").map(Number);
-            return Cesium.Cartesian3.fromDegrees(lon, lat);
+            return Cartesian3.fromDegrees(lon, lat);
           });
 
           window.viewer.entities.add({
             name: body.type,
             polygon: {
-              hierarchy: new Cesium.PolygonHierarchy(coords),
-              material: Cesium.Color.RED.withAlpha(0.5),
+              hierarchy: new PolygonHierarchy(coords),
+              material: polygonColor,
               outline: true,
-              outlineColor: Cesium.Color.BLACK
+              outlineColor: Color.BLACK
             }
+          });
+
+          const cartographics = coords.map(c => Cartographic.fromCartesian(c));
+          const avgLon = cartographics.reduce((sum, c) => sum + c.longitude, 0) / cartographics.length;
+          const avgLat = cartographics.reduce((sum, c) => sum + c.latitude, 0) / cartographics.length;
+          const center = Cartesian3.fromRadians(avgLon, avgLat, 200);
+
+          window.viewer.camera.flyTo({
+            destination: center,
+            orientation: {
+              heading: CesiumMath.toRadians(0.0),
+              pitch: CesiumMath.toRadians(-30.0),
+            },
           });
         } catch (e) {
           console.error("Error creating polygon from event:", e);
