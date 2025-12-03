@@ -5,9 +5,8 @@ import {
   createOsmBuildingsAsync,
   Cartesian3,
   Math as CesiumMath,
-  Color,
-  PolygonHierarchy,
-  Cartographic
+  ImageryLayer,
+  OpenStreetMapImageryProvider
 } from "cesium";
 import "cesium/Widgets/widgets.css";
 import "../src/css/main.css";
@@ -23,7 +22,10 @@ const scenarios = {};
 // Initialize Cesium
 async function initCesium() {
   viewer = new Viewer("cesiumContainer", {
-    terrain: Terrain.fromWorldTerrain(),
+    baseLayer: new ImageryLayer(new OpenStreetMapImageryProvider({
+      url: "https://tile.openstreetmap.org/"
+    }))
+    
   });
 
   // Load OSM buildings
@@ -34,14 +36,15 @@ async function initCesium() {
     console.error("Failed to load OSM buildings:", e);
   }
 
-  // Fly camera to San Francisco
+  
   viewer.camera.flyTo({
-    destination: Cartesian3.fromDegrees(-122.4175, 37.655, 400),
+    destination: Cartesian3.fromDegrees(-96.016, 41.247, 400),
     orientation: {
       heading: CesiumMath.toRadians(0.0),
       pitch: CesiumMath.toRadians(-15.0),
     },
   });
+  
 
   // Make viewer globally accessible for WebSocket updates
   window.viewer = viewer;
@@ -66,9 +69,10 @@ addBtn.addEventListener("click", () => {
   const type = document.getElementById("scenario-type").value.trim();
   const coordsStr = document.getElementById("scenario-coords").value.trim();
   const colorChoice = document.getElementById("scenario-color").value;
+  const actionType = document.getElementById("action-type").value;
 
   // fetch request here
-  fetch("http://localhost:8080/create-area", {
+  fetch("http://localhost:8080/"+actionType, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
