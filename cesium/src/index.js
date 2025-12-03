@@ -24,17 +24,10 @@ async function initCesium() {
   viewer = new Viewer("cesiumContainer", {
     baseLayer: new ImageryLayer(new OpenStreetMapImageryProvider({
       url: "https://tile.openstreetmap.org/"
-    }))
-    
+    })),
   });
 
   // Load OSM buildings
-  try {
-    const buildingTileset = await createOsmBuildingsAsync();
-    viewer.scene.primitives.add(buildingTileset);
-  } catch (e) {
-    console.error("Failed to load OSM buildings:", e);
-  }
 
   
   viewer.camera.flyTo({

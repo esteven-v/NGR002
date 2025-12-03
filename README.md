@@ -67,3 +67,8 @@ For further reference, please consider the following sections:
 - cesium points/labels
     - https://cesium.com/learn/cesiumjs-learn/cesiumjs-creating-entities/
     - https://sandcastle.cesium.com/?id=labels
+- test coordinates
+    - area: 41.217010, -96.014367; 41.236630, -96.022732; 41.236843, -96.012241; 41.227993, -96.003025
+    - points:
+        - 41.23790714412647,-96.02027670289351
+        - 41.253870818102065,-95.97497779228111

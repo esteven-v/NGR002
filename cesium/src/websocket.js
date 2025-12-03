@@ -59,7 +59,7 @@ export function connectWebSocket() {
             });
 
             const area = window.viewer.entities.add({
-              name: body.type,
+              name: body.type+": "+body.name,
               polygon: {
                 hierarchy: new PolygonHierarchy(coords),
                 material: polygonColor,
@@ -68,21 +68,7 @@ export function connectWebSocket() {
               }
             });
 
-            /*
-            const cartographics = coords.map(c => Cartographic.fromCartesian(c));
-            const avgLon = cartographics.reduce((sum, c) => sum + c.longitude, 0) / cartographics.length;
-            const avgLat = cartographics.reduce((sum, c) => sum + c.latitude, 0) / cartographics.length;
-            const center = Cartesian3.fromRadians(avgLon, avgLat, 200);
-
-            window.viewer.camera.flyTo({
-              destination: center,
-              orientation: {
-                heading: CesiumMath.toRadians(0.0),
-                pitch: CesiumMath.toRadians(-30.0),
-              },
-            });
-            */
-           window.viewer.zoomTo(area);
+           window.viewer.zoomTo(window.viewer.entities);
           } catch (e) {
             console.error("Error creating polygon from event:", e);
           }
