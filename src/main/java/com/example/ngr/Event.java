@@ -1,5 +1,4 @@
 package com.example.ngr;
-import java.util.ArrayList;
 
 public class Event {
     public enum EventType {
@@ -15,13 +14,23 @@ public class Event {
      */
     private EventType type;
     private String destination_coords;
-    private ArrayList<String> polygonCoords;
+    private String polygonCoords;
     private String polygonShape;
+    private String polygonColor;
     private String note_text;
+    private String name;
     private boolean isready;
 
     public EventType getType() {
         return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String n) {
+        name = n;
     }
 
     public void setType(EventType t) {
@@ -36,11 +45,19 @@ public class Event {
         destination_coords = d;
     }
 
-    public ArrayList<String> getPolygonCoords() {
+    public String getPolygonCoords() {
         return polygonCoords;
     }
 
-    public void setPolygonCoords(ArrayList<String> coords) {
+    public String getPolygonColor() {
+        return polygonColor;
+    }
+
+    public void setPolygonColor(String color) {
+        polygonColor = color;
+    }
+
+    public void setPolygonCoords(String coords) {
         polygonCoords = coords;
     }
 

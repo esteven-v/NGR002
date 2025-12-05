@@ -14,6 +14,16 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 
 ## Release Notes
 
+### Code Milestone 4
+- The frontend logic that updates the Cesium map has been updated to send post requests from the dashboard to the backend. The backend then sends these requests over Kafka, from which they then get emitted and broadcasted on the websocket.
+- The frontend dashboard requests are sent from the `index.js` file, and the websocket logic that updates the map is still in `websocket.js`.
+- Some of the class members of the event object (`Event.java`) had their types changed to work better with Cesium and the frontend 
+- The Cesium map uses the OpenStreetmap base layer and no 3D buildings.
+
+- map-with-backend: split event/object creation logic on frontend in two: Input into the Create Event dashboard and the websockets that update the map
+- kafka-websocket-test branch: backend, minimal changes
+- Esteven-Branch: Used to migrate CesiumJS code, add additional functionality for demo
+
 ### Code Milestone 3
 - The CesiumJS project has been migrated into the main repository. Currently it just displays the map and has a bottom section showing events/actions.
 - Websocket logic is stored in `websocket.js`, and called when the page is loaded after the cesium map.
@@ -72,3 +82,11 @@ For further reference, please consider the following sections:
 * TODO: implement rest of scenario object
 - Useful example for backend (also has example react app): https://github.com/subhnet/chat-app 
 - setup vscode for spring boot: https://code.visualstudio.com/docs/java/java-spring-boot
+- cesium points/labels
+    - https://cesium.com/learn/cesiumjs-learn/cesiumjs-creating-entities/
+    - https://sandcastle.cesium.com/?id=labels
+- test coordinates
+    - area: 41.217010, -96.014367; 41.236630, -96.022732; 41.236843, -96.012241; 41.227993, -96.003025
+    - points:
+        - 41.23790714412647,-96.02027670289351
+        - 41.253870818102065,-95.97497779228111
