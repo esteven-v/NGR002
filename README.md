@@ -14,6 +14,24 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 
 ## Release Notes
 
+### Code Milestone 4
+- The frontend logic that updates the Cesium map has been updated to send post requests from the dashboard to the backend. The backend then sends these requests over Kafka, from which they then get emitted and broadcasted on the websocket.
+- The frontend dashboard requests are sent from the `index.js` file, and the websocket logic that updates the map is still in `websocket.js`.
+- Some of the class members of the event object (`Event.java`) had their types changed to work better with Cesium and the frontend 
+- The Cesium map uses the OpenStreetmap base layer and no 3D buildings.
+
+- map-with-backend: split event/object creation logic on frontend in two: Input into the Create Event dashboard and the websockets that update the map
+- kafka-websocket-test branch: backend, minimal changes
+- Esteven-Branch: Used to migrate CesiumJS code, add additional functionality for demo
+
+### Code Milestone 3
+- The CesiumJS project has been migrated into the main repository. Currently it just displays the map and has a bottom section showing events/actions.
+- Websocket logic is stored in `websocket.js`, and called when the page is loaded after the cesium map.
+- The rest of the source files are the same as the CesiumJS demo code
+
+- kafka-websocket-test branch: backend, minimal changes
+- Esteven-Branch: Used to migrate CesiumJS code, add additional functionality for demo
+
 ### Code Milestone 2
 - New class: `Event`: This holds multiple different event types and all properties an event could need
 - In `UIController.java`, there are new endpoints for each type of event
