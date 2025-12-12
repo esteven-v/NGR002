@@ -12,14 +12,19 @@ import "cesium/Widgets/widgets.css";
 import "../src/css/main.css";
 import { connectWebSocket, disconnectWebSocket } from './websocket.js';
 
-Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyNDkzYTkwZi03MmJjLTQwMjAtYjBiNi0zOTE2NGFiZjAwNTMiLCJpZCI6MzQ0MDI2LCJpYXQiOjE3NTg2NTM0MDl9.AXndWa8nrm6BAvaZKh18y04HNmLUESVh8HiCiHB_yzI";
+Ion.defaultAccessToken = "put token here";
 
 let viewer;
 
-// Keep track of scenarios
+/**
+ * @desc keep track of created scenarios
+ */
 const scenarios = {};
 
-// Initialize Cesium
+/**
+ * @desc create cesium map with OpenStreetMap layer and position camera
+ * @return {none} - sets window.viewer to created cesium viewer instance
+ */
 async function initCesium() {
   viewer = new Viewer("cesiumContainer", {
     baseLayer: new ImageryLayer(new OpenStreetMapImageryProvider({
@@ -43,7 +48,9 @@ async function initCesium() {
   window.viewer = viewer;
 }
 
-// Main async entry point
+/**
+ * @desc Main async entry point
+ */
 async function main() {
   await initCesium();
   connectWebSocket();
@@ -51,13 +58,25 @@ async function main() {
 
 main();
 
-// Clean disconnect on window unload
+/**
+ * @desc disconnects websocket when window is closed
+ */
 window.addEventListener("beforeunload", () => {
   disconnectWebSocket();
 });
-
-// --- Control panel logic ---
+/**
+ *  @type {button} - HTML button
+ *  @desc Submits event information from dashboard 
+ */
 const addBtn = document.getElementById("add-scenario-btn");
+
+/**
+ * @desc pushes a scenario update
+ * @listens {click} listen event when user adds a scenario
+ * @param {string} scenario_type - scenario color
+ * @param {string} scenario_coords - scenario coordinates (1 or 4 points depending on if it's a area or single point)
+ * 
+ */
 addBtn.addEventListener("click", () => {
   const type = document.getElementById("scenario-type").value.trim();
   const coordsStr = document.getElementById("scenario-coords").value.trim();

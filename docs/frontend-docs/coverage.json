@@ -1,0 +1,17 @@
+{
+  "coverage": "100%",
+  "expectCount": 7,
+  "actualCount": 7,
+  "files": {
+    "src/index.js": {
+      "expectCount": 4,
+      "actualCount": 4,
+      "undocumentLines": []
+    },
+    "src/websocket.js": {
+      "expectCount": 3,
+      "actualCount": 3,
+      "undocumentLines": []
+    }
+  }
+}

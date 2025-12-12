@@ -16,8 +16,15 @@ import {
 } from "cesium";
 import "cesium/Widgets/widgets.css";
 
+/**
+ * @type {stompClient}
+ * @desc websocket client
+ */
 let stompClient = null;
 
+/**
+ * @desc start websocket and subscribe to scenarios topic, edits map based on received events
+ */
 export function connectWebSocket() {
   const socket = new SockJS("http://localhost:8080/ws");
   stompClient = Stomp.over(socket);
@@ -128,6 +135,9 @@ export function connectWebSocket() {
   stompClient.activate();
 }
 
+/**
+ * @desc disconnect from websocket
+ */
 export function disconnectWebSocket() {
   if (stompClient) {
     stompClient.deactivate();

@@ -26,6 +26,8 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^7.2.1",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "memfs": "^3.4.7",
     "sockjs": "^0.3.24",
     "sockjs-client": "^1.6.1",
