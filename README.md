@@ -19,6 +19,13 @@ Capstone NGR002 is a scenario management tool built with Java Springboot, Apache
 
 ## Release Notes
 
+### Code Milestone 5
+
+- Auto-generated documentation has been added for the frontend and backend (See the Documentation section of the README)
+    - Backend: Doxygen, some configuration options were changed from their defaults (see `Doxyfile`)
+    - Frontend: esdoc was used in addition to comments in the source code. These javadoc-style comments were picked up by esdoc and added to the auto-generated documentation
+- all branches and features have been merged into main
+
 ### Code Milestone 4
 - The frontend logic that updates the Cesium map has been updated to send post requests from the dashboard to the backend. The backend then sends these requests over Kafka, from which they then get emitted and broadcasted on the websocket.
 - The frontend dashboard requests are sent from the `index.js` file, and the websocket logic that updates the map is still in `websocket.js`.
